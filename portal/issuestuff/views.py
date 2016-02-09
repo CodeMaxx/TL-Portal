@@ -31,6 +31,12 @@ def exit(request):
 	return HttpResponseRedirect('http://gymkhana.iitb.ac.in/sso/oauth/authorize/?client_id='+clientid+'&response_type=code&scope=basic%20profile%20ldap%20sex&redirect_uri='+redirecturl+'&state=exit')  
 
 
+####################################################################
+##########enter the client secret id in the below function########################################
+#################################################################################
+####################################################################
+##########enter the client secret id in the below function########################################
+#################################################################################
 def redirect(request):
 
 	# return HttpResponseRedirect('http://www.google.com')
