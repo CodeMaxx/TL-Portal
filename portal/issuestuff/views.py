@@ -14,12 +14,29 @@ from django.core.servers.basehttp import FileWrapper
 import re
 import requests
 
+redirecturl = 'http://127.0.0.1:8000/redirect'
+
 def mainpage(request):
 	template = loader.get_template('mainpage.html')
   	return HttpResponse(template.render())
 
 def enter(request):
-  return HttpResponseRedirect('http://www.google.com')  
+	clientid = '07NulE31ebnzsBhGfC8rW0DuGibN5ws2yqyJR2c9'
+	return HttpResponseRedirect('http://gymkhana.iitb.ac.in/sso/oauth/authorize/?client_id='+clientid+'&response_type=code&scope=basic&redirect_uri='+redirecturl+'&state=enter')  
 
 def exit(request):
-  return HttpResponseRedirect('http://www.cse.iitb.ac.in') 
+	clientid = '07NulE31ebnzsBhGfC8rW0DuGibN5ws2yqyJR2c9'
+	return HttpResponseRedirect('http://gymkhana.iitb.ac.in/sso/oauth/authorize/?client_id='+clientid+'&response_type=code&scope=basic&redirect_uri='+redirecturl+'&state=exit')  
+
+
+def redirect(request):
+
+	# return HttpResponseRedirect('http://www.google.com')
+	authcode = request.GET.get('code', 'lol')
+	state  = request.GET.get('state', 'error')
+	print authcode
+	print state
+	
+	template = loader.get_template('test.html')
+	return HttpResponse(template.render())
+

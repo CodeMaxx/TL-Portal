@@ -21,5 +21,6 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^enter/$', views.enter, name='enter'),
     url(r'^exit/$', views.exit, name='exit'),
-    url(r'^.*', views.mainpage, name='default'),
+    url(r'^redirect/$', views.redirect, name='redirect'),
+    url(r'^$', views.mainpage, name='default'),
 ]
