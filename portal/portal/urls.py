@@ -15,12 +15,16 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
-from issuestuff import views
+from issuestuff.views import *
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^enter/$', views.enter, name='enter'),
-    url(r'^exit/$', views.exit, name='exit'),
-    url(r'^redirect/$', views.redirect, name='redirect'),
-    url(r'^$', views.mainpage, name='default'),
-]
+    url(r'^enter/$', enter, name='enter'),
+    url(r'^exit/$', exit, name='exit'),
+    url(r'^redirect/$', redirect, name='redirect'),
+    url(r'^$', mainpage, name='default'),
+]  + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+

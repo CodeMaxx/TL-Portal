@@ -10,14 +10,15 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
-from django.core.servers.basehttp import FileWrapper
+# from django.core.servers.basehttp import FileWrapper
 import re
 import requests
 import json
 import base64
 
-redirecturl = 'http://127.0.0.1:8000/redirect'
-clientid = 'nnzCDk9LFowzvz51f9LXeHV4eWgKX8dOzVDsqFGL'
+redirecturl = 'http://localhost:8000/redirect'
+clientid = 'LEdwtHLmG59vmQAh3O8YE1MyeuEUQo0vF59BHN4y'
+clientsecret = 'Ojxvb3sPNZhBa5kdvQeznMGMJf0EhRNqehMBKEkLRX68tzFkpt7X3kbXSSaaVP16aD7HUoi6Py142sCrfVnqawIhKZwDoRsTu4Hb9vnpkwW6K8SeiE7ezwARlPRU7fUJ'
 
 def mainpage(request):
 	template = loader.get_template('mainpage.html')
@@ -42,9 +43,10 @@ def redirect(request):
 	# return HttpResponseRedirect('http://www.google.com')
 	authcode = request.GET.get('code', 'lol')
 	state  = request.GET.get('state', 'error')
-	clientsecret = 'intentionally_hidden:-P'
+	# clientsecret = 'intentionally_hidden:-P'
 	authtoken = clientid+':'+clientsecret
 	authtoken = base64.b64encode(authtoken)
+
 	#state shows whether the user is entering and exiting
 	url = 'http://gymkhana.iitb.ac.in/sso/oauth/token/'
 	header = {
@@ -63,11 +65,13 @@ def redirect(request):
 	acctoken = parsed_json['access_token']
 	reftoken = parsed_json['refresh_token']
 	userdata = getdata(acctoken,reftoken)
+
+	
 	name = userdata['first_name']+" "+userdata['last_name']
 	ldap = userdata['email']
 	print name
 	print ldap
-	storeentry(name,ldap,state)
+	# storeentry(name,ldap,state)
 	template = loader.get_template('test.html')
 	return HttpResponse(template.render())
 
@@ -82,6 +86,66 @@ def getdata(acctoken,reftoken):
 	parsed_json = json.loads(r.content)
 	return parsed_json
 
-def storeentry(name,ldap,state):
+
+def login(request):
+    user = request.user
+    if user is not None and user.is_active:
+        return redirect("/home/")
+    return render(request,'login.html')
+
+def signin(request):
+    user = request.user
+    if user is not None and user.is_active:
+        return redirect("/home/")
+    if request.method=='POST':
+        username= request.POST['username']
+        password= request.POST['password']
+        user = auth.authenticate(username=username,password=password)
+        if user is not None and user.is_active:
+            auth.login(request,user)
+            return redirect("/home/")
+        else:
+            return render(request,'login.html',{'error':"Wrong Credentials"})
+    return HttpResponse("POST request required")
+
+def signup(request):
+    user = request.user
+    if user is not None and user.is_active:
+        return redirect("/home/")
+    if request.method=='POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        name = request.POST['name']
+        email_id = request.POST['email_id']
+
+        user = auth.authenticate(username=username,password=password)
+        if user is not None and user.is_active:
+            return redirect("/home",{'error':"already registered"})    
+        if "" in [username,password,name,email_id]:
+            return render(request,"login.html",{'error':"Invalid form response. Missing one field."})
+
+        users = User.objects.all()
+        for u in users:
+            if u.username == username:
+                return render(request,'login.html',{'error':"Username Already taken"})
+        _user = Users(username=username,password=password,name=name,email_id=email_id)
+        _user.save()
+        auth_user = User.objects.create_user(username=username,password=password,email=email_id,first_name=name)
+        auth_user.save()
+
+        return redirect("/login")
+    return HttpResponse("POST request required")
+
+def signout(request):
+    auth.logout(request)
+    return redirect("/")
+
+# def newSignUp(userdata):
+
+# def signIn(userdata):
+
+
+
+# def storeentry(name,ldap,state):
 	#write the entry in database
 	#state is enter or exit
