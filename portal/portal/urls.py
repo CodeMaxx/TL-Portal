@@ -23,7 +23,8 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^enter/$', enter, name='enter'),
     url(r'^exit/$', exit, name='exit'),
-    url(r'^redirect/$', redirect, name='redirect'),
+    url(r'^redirect/$', redirect_function, name='redirect'),
+    url(r'^home/$', home, name='redirect'),
     url(r'^$', mainpage, name='default'),
 ]  + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

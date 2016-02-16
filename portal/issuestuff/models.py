@@ -17,12 +17,10 @@ class Log(models.Model):
     outtime = models.DateTimeField(blank=True,null=True)
 
 class Member(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    roll = models.CharField(max_length=9,blank=True,null=True)
     SEX = (
-        ('M', 'Male'),
-        ('F', 'Female'),
-        ('O', 'Others'),
+        ('male', 'Male'),
+        ('female', 'Female'),
+        ('other', 'Other'),
     )
     HOSTELS=(
         ('Hostel 1','Hostel 1'),
@@ -119,6 +117,8 @@ class Member(models.Model):
         ('2020','2020'),
         ('2021','2021'),
     )
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    roll = models.CharField(max_length=9,blank=True,null=True)
     STATUS=(
         ('IN','IN'),
         ('OUT','OUT')
@@ -154,7 +154,6 @@ class Member(models.Model):
        )
     sex = models.CharField(max_length=10,choices=SEX,blank=True,null=True)
     contact = models.CharField(max_length=12,blank=True,null=True)
-    email = models.CharField(max_length=40,blank=True,null=True)
     hostel = models.CharField(max_length=20,blank=True,null=True,choices=HOSTELS)
     room = models.CharField(max_length=5,blank=True,null=True)
     discipline = models.CharField(max_length=100,blank=True,null=True,choices=DEPARTMENT)
