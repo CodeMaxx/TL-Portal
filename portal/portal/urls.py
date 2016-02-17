@@ -23,8 +23,12 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^enter/$', enter, name='enter'),
     url(r'^exit/$', exit, name='exit'),
+    url(r'^logout/$', logout, name='logout'),
     url(r'^redirect/$', redirect_function, name='redirect'),
-    url(r'^home/$', home, name='redirect'),
+    url(r'^home/$', home, name='home'),
+    url(r'^records/$', tl_records, name='records'),
+    url(r'^stuff/$', issuestuff, name='issuestuff'),
+    # url(r'^TL_records/$', TL_records, name='redirect'),
     url(r'^$', mainpage, name='default'),
 ]  + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

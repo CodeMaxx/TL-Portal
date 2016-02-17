@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block style %}
+html, body, .container-table {
+    height: 100%;
+}
+.container-table {
+    display: table;
+}
+.vertical-center-row {
+    display: table-cell;
+    vertical-align: middle;
+}
+{% endblock %}        
+{% block title %}Home{% endblock %}
+{% block content %}    
+    <div class="container container-table">
+        <div class="row vertical-center-row">
+            <div class="text-center col-xs-12 ">
+                <a href = "{% url 'exit' %}"><button type="button" class="btn btn-primary btn-lg">Click here to mark the exit for this period</button></a>
+          </div>
+        </div>  
+    </div>
+{% endblock %}

@@ -164,5 +164,4 @@ class Member(models.Model):
     current_log = models.ForeignKey(Log,on_delete=models.CASCADE,blank=True,null=True)
 
 
-
 # Create your models here.

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}TL records {% endblock %}
+{% block content %}    
+	<br>
+	<br>
+	<br>
+    <div class="container">
+      <div class="page-header">
+        <h1>Your TL Logs</h1>
+      </div>
+	<table class="table table-hover">
+    <thead>
+      <tr>
+        <th>In Time</th>
+        <th>Out Time</th>
+      </tr>
+    </thead>
+	<tbody>
+    {% for log in logs %}
+	      <tr>
+	        <td>{{log.intime}}</td>
+	        <td>{{log.outtime}}</td>
+	      </tr>
+    {% endfor %}
+	</tbody>
+  	</table>
+
+    </div>
+{% endblock %}

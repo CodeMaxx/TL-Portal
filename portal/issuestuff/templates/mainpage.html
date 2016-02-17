@@ -1,17 +1,104 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+        <style>
+        html, body {
+            height: 100%;
+            min-height: 100%;
+            position: relative;
+        }
+
+        body {
+            word-wrap: break-word;
+        }
+
+        .dropdown-button {
+            background-color: transparent;
+        }
+
+        .center-block {
+            max-width: 500px;
+            padding: 19px 29px 29px;
+            margin: 0 auto 20px;
+            background-color: #fff;
+            border: 1px solid #e5e5e5;
+            -webkit-border-radius: 5px;
+            -moz-border-radius: 5px;
+            border-radius: 5px;
+            -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+            -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+        }
+
+        .site-footer {
+            position: relative;
+            margin-top: 40px;
+            padding-top: 40px;
+            padding-bottom: 40px;
+            font-size: 15px;
+            line-height: 1.5;
+            color: #767676;
+            border-top: 1px solid #eee;
+        }
+            .masthead {
+                position: relative;
+                padding: 80px 0;
+                color: #cdbfe3;
+                text-align: center;
+                text-shadow: 0 1px 0 rgba(0,0,0,.1);
+                /* background-color: #CEC7D9; */
+                background-image: -webkit-gradient(linear,left top,left bottom,from(#BC506C),to(#6f5499));
+                background-image: -webkit-linear-gradient(top,#BC506C 0,#6f5499 100%);
+                background-image: -o-linear-gradient(top,#BC506C 0,#6f5499 100%);
+                background-image: linear-gradient(to bottom,#BC506C 0,#6f5499 100%);
+                filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#BC506C', endColorstr='#6F5499', GradientType=0);
+                background-repeat: repeat-x;
+                }
+            .btn-outline-inverse {
+                color: #fff;
+                background-color: transparent;
+                border-color: #cdbfe3;
+            }
+
+            .btn-outline-inverse:active, .btn-outline-inverse:focus, .btn-outline-inverse:hover {
+                color: #563d7c;
+                text-shadow: none;
+                background-color: #fff;
+                border-color: #fff;
+            }
+
+            .masthead .btn {
+                width: 100%;
+                padding: 15px 30px;
+                font-size: 20px;
+            }
+
+            @media (min-width: 480px) {
+                .masthead .btn {
+                    width: auto;
+                }
+            }
+        </style>
         <title>Login</title>
     </head>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
   <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://necolas.github.io/normalize.css/3.0.3/normalize.css">
   <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <body>
-        <a href = '/enter/'><button type="button" class="btn btn-primary active"> Enter </button></a>
-        <a href = '/exit/'><button type="button" class="btn btn-primary active"> Exit </button></a>
+        <div class="container-fluid">
+            <div class="masthead">
 
-    <a href="/login_admin/">Click here to login as admin</a>
-                <br>
+                  <div align="text-center">
+                    <h1 style="font-size: 100px">Tinkerers' Lab</h1>
+                    <a href = '/enter/'><button type="button" class="btn btn-outline-inverse btn-lg"> Login </button></a>
+                  </div>
+                    </div>
+            </div>
+            </div>
+        </div>
     </body>
 </html>
 

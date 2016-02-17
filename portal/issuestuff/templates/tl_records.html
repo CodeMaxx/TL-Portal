@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="http://code.jquery.com/jquery.min.js"></script>
+    <link href="http://getbootstrap.com/dist/css/bootstrap.css" rel="stylesheet" type="text/css" />
+    <script src="http://getbootstrap.com/dist/js/bootstrap.js"></script>
+    <meta charset="utf-8">
+    <title>Homepage</title>
+    <style>
+         html, body, .container-table {
+            height: 100%;
+        }
+        .container-table {
+            display: table;
+        }
+        .vertical-center-row {
+            display: table-cell;
+            vertical-align: middle;
+        }
+    </style>    
+
+
+  </head>
+  <body>
+         <nav class="navbar navbar-inverse navbar-fixed-top">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <a class="navbar-brand" href="#">Tinkerers' Lab</a>
+            </div>
+            <ul class="nav navbar-nav">
+              <li><a href="#">Home</a></li>
+              <li  class="active"><a href="/TL_records">TL Records</a></li>
+              <li><a href="/Stuff">TL issues</a></li>
+            </ul>
+                <ul class="nav navbar-nav navbar-right">
+              <li><a href="#"><span class="glyphicon glyphicon-log-user"></span>Siddharth bulia</a></li>
+              <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span>Logout</a></li>
+            </ul>
+          </div>
+        </nav>
+    <div class="container container-table">
+        <div class="row vertical-center-row">
+            <div class="text-center col-xs-12 ">
+                <a href = '/exit/'><button type="button" class="btn btn-primary btn-lg">Click here to mark the exit for this period</button></a>
+            </div>
+    </div>
+
+  </body>
+</html>

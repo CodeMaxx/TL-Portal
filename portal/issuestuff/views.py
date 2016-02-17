@@ -13,6 +13,7 @@ from django.core.urlresolvers import reverse
 from django.contrib import auth
 from django.contrib.auth.models import User
 from models import *
+import datetime
 # from django.core.servers.basehttp import FileWrapper
 import re
 import requests
@@ -25,15 +26,37 @@ clientsecret = 'Ojxvb3sPNZhBa5kdvQeznMGMJf0EhRNqehMBKEkLRX68tzFkpt7X3kbXSSaaVP16
 
 def mainpage(request):
     template = loader.get_template('mainpage.html')
-    return HttpResponse(template.render())
+    return render("mainpage.html")
 
 def enter(request):
-    return HttpResponseRedirect('http://gymkhana.iitb.ac.in/sso/oauth/authorize/?client_id='+clientid+'&response_type=code&scope=basic%20profile%20ldap%20sex%20picture%20phone%20insti_address%20program%20secondary_emails&redirect_uri='+redirecturl+'&state=enter')  
+    user = request.user
+    if user is not None and user.is_active:
+        return redirect(reverse('home'))
+    return HttpResponseRedirect(ssoURL()) 
 
+def ssoURL():
+    return 'http://gymkhana.iitb.ac.in/sso/oauth/authorize/?client_id='+clientid+'&response_type=code&scope=basic%20profile%20ldap%20sex%20picture%20phone%20insti_address%20program%20secondary_emails&redirect_uri='+redirecturl+'&state=enter'
+
+def logout(request):
+    user = request.user
+    if user is not None and user.is_active:
+        auth.logout(request)
+        return redirect(reverse("default"))
+    return redirect(reverse("default"))    
+    
 def exit(request):
-    auth.logout(request)
-    return HttpResponseRedirect("/")
-    return HttpResponseRedirect('http://gymkhana.iitb.ac.in/sso/oauth/authorize/?client_id='+clientid+'&response_type=code&scope=basic%20profile%20ldap%20sex%20picture%20phone%20insti_address%20program%20secondary_emails&redirect_uri='+redirecturl+'&state=exit')
+    user = request.user
+    if user is not None and user.is_active:
+        if(user.member.current_status=="IN"):
+            now = datetime.datetime.now()
+            user.member.current_status="OUT"
+            user.member.current_log.outtime = now
+            user.member.current_log.save()
+            user.member.save()
+            user.save()
+        auth.logout(request)
+        return redirect(reverse("default"))
+    return redirect(reverse("default"))    
 
 
 ####################################################################
@@ -43,8 +66,6 @@ def exit(request):
 ##########enter the client secret id in the below function########################################
 #################################################################################
 def redirect_function(request):
-
-    # return HttpResponseRedirect('http://www.google.com')
     authcode = request.GET.get('code', 'lol')
     state  = request.GET.get('state', 'error')
     # clientsecret = 'intentionally_hidden:-P'
@@ -75,22 +96,26 @@ def redirect_function(request):
 
     if user is not None and user.is_active:
         auth.login(request,user)
-        return HttpResponse('old user')
+        new_record(request)
         return HttpResponseRedirect("/home/")
     else:
         signup(userdata)
         user = auth.authenticate(username=username,password=password)
         auth.login(request,user)
-        return HttpResponse('new user')
+        new_record(request)
         return HttpResponseRedirect("/home/")    
 
-    name = userdata['first_name']+" "+userdata['last_name']
-    ldap = userdata['email']
-    print name
-    print ldap
-    # storeentry(name,ldap,state)
-    template = loader.get_template('test.html')
-    return HttpResponse(template.render())
+def new_record(request):
+    user = request.user
+    if user is not None and user.is_active:
+        if user.member.current_status!="IN":
+            now = datetime.datetime.now()
+            log = Log(user=user,intime=now)
+            log.save()
+            user.member.current_status="IN"
+            user.member.current_log=log
+            user.member.save()
+            user.save()
 
 def getdata(acctoken,reftoken):
 
@@ -104,28 +129,6 @@ def getdata(acctoken,reftoken):
     r = requests.get(url,headers=header)
     parsed_json = json.loads(r.content)
     return parsed_json
-
-
-def login(request):
-    user = request.user
-    if user is not None and user.is_active:
-        return redirect("/home/")
-    return render(request,'login.html')
-
-def signin(request):
-    user = request.user
-    if user is not None and user.is_active:
-        return redirect("/home/")
-    if request.method=='POST':
-        username= request.POST['username']
-        password= request.POST['password']
-        user = auth.authenticate(username=username,password=password)
-        if user is not None and user.is_active:
-            auth.login(request,user)
-            return redirect("/home/")
-        else:
-            return render(request,'login.html',{'error':"Wrong Credentials"})
-    return HttpResponse("POST request required")
 
 def signup(userdata):
     username = userdata.get('username')
@@ -147,7 +150,7 @@ def signup(userdata):
         join_year = program.get('join_year')
         graduation_year = program.get('graduation_year')
         degree = program.get('degree_name')
-    current_status = "IN"
+    current_status = None
     address = userdata.get('insti_address')
     hostel = None
     room = None
@@ -164,18 +167,17 @@ def signup(userdata):
     return 
 
 def home(request):
-    return HttpResponse("home")
+    user = request.user
+    if user is not None and user.is_active:
+        return render(request,'home.html',{'user':user})
+    return redirect("/")    
 
-def signout(request):
-    auth.logout(request)
-    return redirect("/")
+def tl_records(request):
+    user = request.user
+    if user is not None and user.is_active:
+        logs = Log.objects.filter(user = user)
+        return render(request,"records.html",{'logs':logs})
+    return redirect(reverse("default"))
 
-# def newSignUp(userdata):
-
-# def signIn(userdata):
-
-
-
-# def storeentry(name,ldap,state):
-    #write the entry in database
-    #state is enter or exit
+def issuestuff(request):
+    return HttpResponse("Stuff page")
