@@ -20,6 +20,7 @@ import re
 import requests
 import json
 import base64
+from django.http import Http404
 
 redirecturl = 'http://localhost:8000/redirect'
 clientid = 'LEdwtHLmG59vmQAh3O8YE1MyeuEUQo0vF59BHN4y'
@@ -221,3 +222,13 @@ def tl_records(request):
 
 def issuestuff(request):
     return HttpResponse("Stuff page")
+
+def admin_interface(request,page):
+    user = request.user
+    if user is not None and user.is_active and user.is_staff:
+        if(page==""):
+            return HttpResponse("admin_interface")
+    return HttpResponse        
+
+def my_404_view(request):
+    return render(render,"404page.html")    
