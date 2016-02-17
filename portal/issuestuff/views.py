@@ -14,6 +14,7 @@ from django.contrib import auth
 from django.contrib.auth.models import User
 from models import *
 import datetime
+from django.contrib import messages
 # from django.core.servers.basehttp import FileWrapper
 import re
 import requests
@@ -26,9 +27,9 @@ clientsecret = 'Ojxvb3sPNZhBa5kdvQeznMGMJf0EhRNqehMBKEkLRX68tzFkpt7X3kbXSSaaVP16
 
 def mainpage(request):
     template = loader.get_template('mainpage.html')
-    return render("mainpage.html")
+    return render(request,"mainpage.html")
 
-def enter(request):
+def login(request):
     user = request.user
     if user is not None and user.is_active:
         return redirect(reverse('home'))
@@ -44,6 +45,17 @@ def logout(request):
         return redirect(reverse("default"))
     return redirect(reverse("default"))    
     
+def enter(request):
+    user = request.user
+    if user is not None and user.is_active:
+        if new_record(request):
+            return redirect(reverse("home"))
+        else:
+            messages.warning(request, 'Please fill purpose.')
+            return redirect(reverse("home"))    
+    return redirect(reverse("default"))    
+
+
 def exit(request):
     user = request.user
     if user is not None and user.is_active:
@@ -54,8 +66,7 @@ def exit(request):
             user.member.current_log.save()
             user.member.save()
             user.save()
-        auth.logout(request)
-        return redirect(reverse("default"))
+        return redirect(reverse("home"))
     return redirect(reverse("default"))    
 
 
@@ -90,35 +101,37 @@ def redirect_function(request):
     acctoken = parsed_json['access_token']
     reftoken = parsed_json['refresh_token']
     userdata = getdata(acctoken,reftoken)
+    # return HttpResponse(userdata)
     username = userdata['username']
     password = username
     user = auth.authenticate(username=username,password=password)
 
     if user is not None and user.is_active:
         auth.login(request,user)
-        new_record(request)
         return HttpResponseRedirect("/home/")
     else:
         signup(userdata)
         user = auth.authenticate(username=username,password=password)
         auth.login(request,user)
-        new_record(request)
         return HttpResponseRedirect("/home/")    
 
 def new_record(request):
     user = request.user
     if user is not None and user.is_active:
         if user.member.current_status!="IN":
+            if(request.POST.get('purpose')==""):
+                return False
             now = datetime.datetime.now()
-            log = Log(user=user,intime=now)
+            log = Log(user=user,intime=now,purpose=request.POST.get('purpose'))
             log.save()
             user.member.current_status="IN"
             user.member.current_log=log
             user.member.save()
             user.save()
+        return True
+    return False        
 
 def getdata(acctoken,reftoken):
-
     fields = 'first_name,last_name,type,profile_picture,sex,username,email,program,contacts,insti_address,secondary_emails,mobile,roll_number'
     url = 'http://gymkhana.iitb.ac.in/sso/user/api/user/?fields='+fields
     header = {
@@ -127,6 +140,7 @@ def getdata(acctoken,reftoken):
         'Authorization': 'Bearer '+acctoken
     }
     r = requests.get(url,headers=header)
+    # return r.content
     parsed_json = json.loads(r.content)
     return parsed_json
 
@@ -158,25 +172,51 @@ def signup(userdata):
         hostel = address.get('hostel_name')
         room = address.get('room')
     current_log = None
+    secondary_emails = userdata.get("secondary_emails")
+    secondary_email=None
+    if secondary_emails!=None:
+        if(len(secondary_emails)>0):
+            secondary_email = secondary_emails[0].get('email')
 
     auth_user = User.objects.create_user(username=username,password=password,email=email,first_name=first_name,last_name=last_name)
     auth_user.save()
 
-    _user = Member(user=auth_user,roll=roll_number,sex=sex,contact=contact,hostel=hostel,room=room,discipline=discipline,join_year=join_year,graduation_year=graduation_year,degree=degree,current_status=current_status,current_log = current_log)
+    _user = Member(user=auth_user,roll=roll_number,sex=sex,contact=contact,hostel=hostel,room=room,discipline=discipline,join_year=join_year,graduation_year=graduation_year,degree=degree,current_status=current_status,current_log = current_log,secondary_email=secondary_email)
     _user.save()
     return 
 
 def home(request):
     user = request.user
     if user is not None and user.is_active:
-        return render(request,'home.html',{'user':user})
-    return redirect("/")    
+        return render(request,'home.html',{'user':user,"active":"home"})
+    return redirect(reverse("default"))    
+
+def validateEmail(email ):
+    from django.core.validators import validate_email
+    from django.core.exceptions import ValidationError
+    try:
+        validate_email( email )
+        return True
+    except ValidationError:
+        return False
+
+def enter_secondary_email(request):
+    user = request.user
+    if user is not None and user.is_active:
+        if request.POST.get('email')!=None:
+            email = request.POST.get('email')
+            if validateEmail(email):
+                user.member.secondary_email=email
+                user.member.save()
+            else:
+                messages.warning(request,"Please enter correct email address.")    
+    return redirect(reverse("home"))
 
 def tl_records(request):
     user = request.user
     if user is not None and user.is_active:
-        logs = Log.objects.filter(user = user)
-        return render(request,"records.html",{'logs':logs})
+        logs = Log.objects.filter(user = user).order_by('-intime')
+        return render(request,"records.html",{'logs':logs,"active":"records"})
     return redirect(reverse("default"))
 
 def issuestuff(request):

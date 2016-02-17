@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <script src="http://code.jquery.com/jquery.min.js"></script>
-    <link href="http://getbootstrap.com/dist/css/bootstrap.css" rel="stylesheet" type="text/css" />
-    <script src="http://getbootstrap.com/dist/js/bootstrap.js"></script>
+      {% load staticfiles %}
+    <script src="{% static 'issuestuff/js/jquery.min.js' %}"></script>
+    <link href="{% static 'issuestuff/css/bootstrap.min.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'issuestuff/css/normalize.min.css' %}" rel="stylesheet" type="text/css" />
+    <script src="{% static 'issuestuff/js/bootstrap.min.js' %}"></script>
     <meta charset="utf-8">
     <title>{% block title %}{% endblock %}</title>
     <style>
@@ -16,12 +18,12 @@
          <nav class="navbar navbar-inverse navbar-fixed-top">
           <div class="container">
             <div class="navbar-header">
-              <a class="navbar-brand" href="#">Tinkerers' Lab</a>
+              <a class="navbar-brand" href="{% url 'home' %}">Tinkerers' Lab</a>
             </div>
             <ul class="nav navbar-nav">
-              <li class="active"><a href="{% url 'home' %}">Home</a></li>
-              <li><a href="{% url 'records' %}">TL Records</a></li>
-              <li><a href="{% url 'issuestuff' %}">TL issues</a></li>
+              <li {% if active == "home" %}class="active"{% endif %}><a href="{% url 'home' %}">Home</a></li>
+              <li {% if active == "records" %}class="active"{% endif %}><a href="{% url 'records' %}">TL Records</a></li>
+<!--               <li {% if active == "issuestuff" %}class="active"{% endif %}><a href="{% url 'issuestuff' %}">TL issues</a></li> -->
             </ul>
                 <ul class="nav navbar-nav navbar-right">
               <li><a href="#"><span class="glyphicon glyphicon-log-user"></span>{{user.first_name}} {{user.last_name}}</a></li>

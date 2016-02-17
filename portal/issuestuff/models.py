@@ -12,7 +12,8 @@ class IssuingLog(models.Model):
     returntime = models.DateTimeField(blank=True,null=True)
 
 class Log(models.Model):
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    purpose = models.CharField(max_length=100,blank=True,null=True)
     intime = models.DateTimeField(blank=True,null=True)
     outtime = models.DateTimeField(blank=True,null=True)
 
@@ -140,7 +141,7 @@ class Member(models.Model):
     ('Visiting Student', 'Visiting Student') ,
     ('Master of Philosophy (Exit Degree)', 'Master of Philosophy (Exit Degree)') ,
     ('Master of Science (Exit Degree)', 'Master of Science (Exit Degree)') ,
-    ('M.Sc. + M.Tech. Dual Degree', 'M.Sc. + M.Tech. Dual Degree') ,
+    # ('M.Sc. + M.Tech. Dual Degree', 'M.Sc. + M.Tech. Dual Degree') ,
     ('M.Sc. + Ph.D. Dual Degree', 'M.Sc. + Ph.D. Dual Degree') ,
     ('M.Phil. + Ph.D. Dual Degree', 'M.Phil. + Ph.D. Dual Degree') ,
     ('Executive MBA', 'Executive MBA') ,
@@ -161,7 +162,7 @@ class Member(models.Model):
     graduation_year = models.CharField(max_length=4,blank=True,null=True,choices=GRAD_YEAR)
     degree = models.CharField(max_length=50,blank=True,null=True,choices=DEGREE)
     current_status = models.CharField(max_length=5,blank=True,null=True,choices=STATUS)
-    current_log = models.ForeignKey(Log,on_delete=models.CASCADE,blank=True,null=True)
-
+    current_log = models.ForeignKey(Log,on_delete=models.SET_NULL,blank=True,null=True)
+    secondary_email = models.CharField(max_length=50,blank=True,null=True)
 
 # Create your models here.

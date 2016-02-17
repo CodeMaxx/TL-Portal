@@ -16,9 +16,45 @@ html, body, .container-table {
 {% block content %}    
     <div class="container container-table">
         <div class="row vertical-center-row">
+            {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            {% if request.user.member.secondary_email != None %}
+            {% if request.user.member.current_status == "IN" %}
             <div class="text-center col-xs-12 ">
-                <a href = "{% url 'exit' %}"><button type="button" class="btn btn-primary btn-lg">Click here to mark the exit for this period</button></a>
-          </div>
+                <a href = "{% url 'exit' %}"><button type="button" class="btn btn-primary btn-lg">Click here to exit</button></a>
+            </div>
+            {% else %}
+                <form class="form-horizontal" role="form" method="post" action="{% url 'enter' %}">
+                 {% csrf_token %} 
+                  <div class="form-group">
+                    <label class="control-label col-sm-2" for="purpose">Purpose</label>
+                    <div class="col-sm-10">
+                      <input type="text" class="form-control" id="purpose" placeholder="Purpose of visiting TL" name="purpose">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                      <button type="submit" class="btn btn-default">Enter</button>
+                    </div>
+                  </div>
+                </form>
+
+            {% endif %}
+            {% else %}
+             <form class="form-inline" role="form" action="{% url 'secondary_email' %}" method="post">
+             {% csrf_token %}
+              <div class="form-group">
+                <label for="email">Secondary Email Address (preferably gmail)</label>
+                <input type="email" class="form-control" id="email" name="email">
+              </div>
+              <button type="submit" class="btn btn-default">Submit</button>
+            </form>
+            {% endif %}
         </div>  
     </div>
 {% endblock %}

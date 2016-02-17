@@ -83,17 +83,18 @@
         </style>
         <title>Login</title>
     </head>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://necolas.github.io/normalize.css/3.0.3/normalize.css">
-  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+      {% load staticfiles %}
+    <script src="{% static 'issuestuff/js/jquery.min.js' %}"></script>
+    <link href="{% static 'issuestuff/css/bootstrap.min.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'issuestuff/css/normalize.min.css' %}" rel="stylesheet" type="text/css" />
+    <script src="{% static 'issuestuff/js/bootstrap.min.js' %}"></script>
     <body>
         <div class="container-fluid">
             <div class="masthead">
 
                   <div align="text-center">
                     <h1 style="font-size: 100px">Tinkerers' Lab</h1>
-                    <a href = '/enter/'><button type="button" class="btn btn-outline-inverse btn-lg"> Login </button></a>
+                    <a href = '{% url "login" %}'><button type="button" class="btn btn-outline-inverse btn-lg"> Login </button></a>
                   </div>
                     </div>
             </div>

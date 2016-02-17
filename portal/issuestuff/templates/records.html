@@ -8,10 +8,11 @@
     <div class="container">
       <div class="page-header">
         <h1>Your TL Logs</h1>
-      </div>
-	<table class="table table-hover">
+      </div>	
+	<table class="table table-hover table-striped table-bordered">
     <thead>
       <tr>
+        <th>Purpose</th>
         <th>In Time</th>
         <th>Out Time</th>
       </tr>
@@ -19,6 +20,7 @@
 	<tbody>
     {% for log in logs %}
 	      <tr>
+          <td>{{log.purpose}}</td>
 	        <td>{{log.intime}}</td>
 	        <td>{{log.outtime}}</td>
 	      </tr>

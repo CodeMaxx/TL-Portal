@@ -2,10 +2,10 @@ from django.contrib import admin
 from issuestuff.models import Member,Log,IssuingLog,Stuff
 
 class MemberAdmin(admin.ModelAdmin):
-	list_display = ('user','roll','sex','contact','hostel','discipline','join_year','graduation_year','degree','current_status','current_log')
+	list_display = ('user','roll','sex','contact','hostel','discipline','join_year','graduation_year','degree','current_status','current_log','secondary_email')
 
 class LogAdmin(admin.ModelAdmin):
-	list_display=('user','intime','outtime')
+	list_display=('user','purpose','intime','outtime')
 
 class IssuingLogAdmin(admin.ModelAdmin):
 	list_display = ('user','stuff','quantity','taketime','returntime')	
