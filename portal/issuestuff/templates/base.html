@@ -11,6 +11,9 @@
     <style>
     {% block style %}{% endblock %}
     </style>    
+    <script type="text/javascript">
+      {% block script %}{% endblock %}
+    </script>
 
 
   </head>
@@ -27,7 +30,7 @@
             </ul>
                 <ul class="nav navbar-nav navbar-right">
               <li><a href="#"><span class="glyphicon glyphicon-log-user"></span>{{user.first_name}} {{user.last_name}}</a></li>
-              <li><a href="{% url 'logout' %}"><span class="glyphicon glyphicon-log-out"></span>Logout</a></li>
+              <li><a onclick="window.open('http://gymkhana.iitb.ac.in/sso/account/logout/');return true;" href="{% url 'logout' %}"><span class="glyphicon glyphicon-log-out"></span>Logout</a></li>
             </ul>
           </div>
         </nav>
