@@ -24,7 +24,7 @@ handler500 = 'issuestuff.views.my_404_view'
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^admin_site/([^/]+)',admin_interface,name="admin_interface"),
+    url(r'^admin_site/([^/]*)',admin_interface,name="admin_interface"),
     url(r'^enter/$', enter, name='enter'),
     url(r'^exit/$', exit, name='exit'),
     url(r'^logout/$', logout, name='logout'),

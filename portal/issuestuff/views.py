@@ -42,6 +42,7 @@ def ssoURL():
 def logout(request):
     user = request.user
     if user is not None and user.is_active:
+        
         auth.logout(request)
         return redirect(reverse("default"))
     return redirect(reverse("default"))    
@@ -228,7 +229,7 @@ def admin_interface(request,page):
     if user is not None and user.is_active and user.is_staff:
         if(page==""):
             return HttpResponse("admin_interface")
-    return HttpResponse        
+    return HttpResponse("Invalid URL")        
 
 def my_404_view(request):
     return render(render,"404page.html")    
