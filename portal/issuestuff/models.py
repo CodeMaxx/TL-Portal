@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 
 class Stuff(models.Model):
     name = models.CharField(max_length=50,blank=True,null=True)
+    id = models.IntegerField(primary_key = True)
 
 class IssuingLog(models.Model):
     user = models.ForeignKey(User)

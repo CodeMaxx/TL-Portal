@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}TL Confirm Return{% endblock %}
+{% block content %}    
+	<br>
+	<br>
+	<br>
+    <div class="container">
+      <div class="page-header">
+        <h1>Return Stuff</h1>
+      </div>  
+  <table class="table table-hover table-striped table-bordered">
+  <tbody>
+    <tr>
+      <th>Stuff Id</th>
+      <td>{{log.stuff.id}}</td>
+    </tr>
+    <tr>
+      <th>Stuff</th>
+      <td>{{log.stuff.name}}</td>
+    </tr>
+    <tr>
+      <th>User</th>
+      <td>{{log.user.username}} ({{log.user.first_name}} {{log.user.last_name}})</td>
+    </tr>
+    <tr>
+      <th>Quantity</th>
+      <td>{{log.quantity}}</td>
+    </tr>
+    <tr>
+      <th>Take Time</th>
+      <td>{{log.taketime}}</td>
+    </tr>
+  </tbody>
+    </table>
+
+    <form action="/admin_site/issue/return/confirm/" method="POST">
+      {% csrf_token %}
+      <input type="hidden" value={{log.id}} name="log_id"></input><br>
+      <h4>Confirm Return?</h4><br>
+      <input type="submit" class="btn btn-default btn-small" value="Return">
+    </form>
+
+    </div>
+{% endblock %}

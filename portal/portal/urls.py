@@ -24,7 +24,14 @@ handler500 = 'issuestuff.views.my_404_view'
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^admin_site/([^/]+)',admin_interface,name="admin_interface"),
+    url(r'^admin_site/records/search/([^/]*)',admin_records_search,name="admin_records_search"),
+    url(r'^admin_site/records/([^/]*)',admin_records,name="admin_records"),
+    url(r'^admin_site/issue/return/confirm/$',return_confirmed,name="return_confirmed"),
+    url(r'^admin_site/issue/return/$',return_confirm,name="return_confirm"),
+    url(r'^admin_site/issue/new/confirm/$',new_issue_confirmed,name="new_issue_confirmed"),
+    url(r'^admin_site/issue/new/$',new_issue_confirm,name="new_issue_confirm"),
+    url(r'^admin_site/issues/([^/]+)',admin_issue,name="admin_issue"),
+    url(r'^admin_site/([^/]*)',admin_interface,name="admin_interface"),
     url(r'^enter/$', enter, name='enter'),
     url(r'^exit/$', exit, name='exit'),
     url(r'^logout/$', logout, name='logout'),
