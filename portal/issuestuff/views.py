@@ -42,6 +42,7 @@ def ssoURL():
 def logout(request):
     user = request.user
     if user is not None and user.is_active:
+        
         auth.logout(request)
         return redirect(reverse("default"))
     return redirect(reverse("default"))    
@@ -366,7 +367,6 @@ def new_issue_confirmed(request):
     issuelog = IssuingLog(user=issue_user,stuff=stuff,quantity=quantity,taketime=now)
     issuelog.save()
     return HttpResponseRedirect("/admin_site/")
-
 
 def my_404_view(request):
     return render(render,"404page.html")    
