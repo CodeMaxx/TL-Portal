@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}TL Issue records {% endblock %}
+{% block content %}    
+	<br>
+	<br>
+	<br>
+    <div class="container">
+      <div class="page-header">
+        <h1>TL Stuff</h1>
+      </div>  
+  <table class="table table-hover table-striped table-bordered">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Issue</th>
+      </tr>
+    </thead>
+  <tbody>
+    {% for stuff in stuffs %}
+        <tr>
+          <td>{{stuff.id}}</td>
+          <td>{{stuff.name}}</td>
+          <td>
+              <form action="/admin_site/issue/new/" method="POST">
+                {% csrf_token %}
+                <input type="hidden" value={{stuff.id}} id="stuff_id" name="stuff_id"></input>
+                <input type="submit" class="btn btn-default btn-small" value="Issue">
+              </form>
+          </td>
+        </tr>
+    {% endfor %}
+  </tbody>
+    </table>
+
+    </div>
+{% endblock %}

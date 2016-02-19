@@ -221,14 +221,152 @@ def tl_records(request):
     return redirect(reverse("default"))
 
 def issuestuff(request):
-    return HttpResponse("Stuff page")
-
+    user = request.user
+    if user is not None and user.is_active:
+        issuelog = IssuingLog.objects.filter(user=user)
+        return render(request,"issue_records.html",{'logs':issuelog,"active":"issuestuff","type":"return","is_Staff":False})
+    return redirect(reverse("default"))
+    
 def admin_interface(request,page):
     user = request.user
-    if user is not None and user.is_active and user.is_staff:
-        if(page==""):
-            return HttpResponse("admin_interface")
-    return HttpResponse        
+    if not (user is not None and user.is_active and user.is_staff):
+        return redirect(reverse("home"))
+
+    if(page == ""):
+        return HttpResponseRedirect("/admin_site/home/")
+    elif(page == "home"):
+        return render(request,"admin_home.html")
+    elif(page == "records"):
+        return HttpResponseRedirect("/admin_site/records/all")
+        
+
+    return HttpResponse("Page Not Found 2")
+
+def admin_records(request,page):
+    user = request.user
+    if not (user is not None and user.is_active and user.is_staff):
+        return redirect(reverse("home"))
+
+    if(page==""):
+        return HttpResponseRedirect("/admin_site/records/all")
+    elif(page=="all"):
+        logs = Log.objects.order_by('-intime')
+        return render(request,"admin_records.html",{'logs':logs,"active":"records"})
+    elif(page=="current"):
+        logs = Log.objects.filter(outtime__isnull=True).order_by('-intime')
+        return render(request,"admin_records.html",{'logs':logs,"active":"records"})
+    elif(page=="search"):
+        return HttpResponse("Error Wrong function call")
+
+    return HttpResponse("Page Not Found 3")
+
+def admin_records_search(request,username):
+    user = request.user
+    if not (user is not None and user.is_active and user.is_staff):
+        return redirect(reverse("home"))
+
+    user_exists = User.objects.filter(username=username).exists()
+    if user_exists:
+        found_user = User.objects.get(username=username)
+        logs = Log.objects.filter(user=found_user).order_by('-intime')
+        return render(request,"admin_records.html",{'logs':logs,"active":"records"})
+    else:
+        return HttpResponse("User Not Found")
+
+def admin_issue(request, page):
+    user = request.user
+    if not (user is not None and user.is_active and user.is_staff):
+        return redirect(reverse("home"))
+
+    if(page == ""):
+        return HttpResponseRedirect("/admin_site/issues/all")
+    elif(page == "all"):
+        issuelogs = IssuingLog.objects.order_by('-taketime')
+        return render(request,"issue_records.html",{'logs':issuelogs,"active":"issuestuff","is_Staff":True})
+    elif(page == "current"):
+        issuelogs = IssuingLog.objects.filter(returntime__isnull=True).order_by('-taketime')
+        return render(request,"issue_records.html",{'logs':issuelogs,"active":"issuestuff","is_Staff":True})
+    elif(page == "stuff"):
+        stuffs = Stuff.objects.order_by('-id')
+        return render(request,"issue_stuff.html",{'stuffs':stuffs,"active":"issuestuff","is_Staff":True})
+    else:
+        return HttpResponse("Page Not Found 1")
+
+def return_confirm(request):
+    user = request.user
+    if not (user is not None and user.is_active and user.is_staff):
+        return redirect(reverse("home"))
+
+    option = request.POST.get('log_id')
+    issuelogs_exists = IssuingLog.objects.filter(id=option).exists()
+    if not issuelogs_exists:
+        return HttpResponse("Issue Log Not Found")
+
+    issuelog = IssuingLog.objects.get(id=option)
+    return render(request,"return_confirm.html",{'log':issuelog,"active":"issuestuff","type":"return","is_Staff":True})
+
+
+def return_confirmed(request):
+    user = request.user
+    if not (user is not None and user.is_active and user.is_staff):
+        return redirect(reverse("home"))
+
+    option = request.POST.get('log_id')
+    issuelogs_exists = IssuingLog.objects.filter(id=option).exists()
+    if not issuelogs_exists:
+        return HttpResponse("Issue Log Not Found")
+
+    issuelog = IssuingLog.objects.get(id=option)
+    now=datetime.datetime.now()
+    issuelog.returntime = now
+    issuelog.save()
+    return HttpResponseRedirect("/admin_site/")
+
+def new_issue_confirm(request):
+    user = request.user
+    if not (user is not None and user.is_active and user.is_staff):
+        return redirect(reverse("home"))
+
+    stuff_id = request.POST.get('stuff_id')
+    stuff_exists = Stuff.objects.filter(id=stuff_id).exists()
+    # return HttpResponse(str(stuff_exists)+ " -- " + str(stuff_id) + " -- " + str(Stuff.objects.all()[0].id))
+    if not stuff_exists:
+        return HttpResponse("Stuff Not Found 2")
+
+    stuff = Stuff.objects.get(id=stuff_id)
+    return render(request,"issue_confirm.html",{'stuff':stuff,"active":"issuestuff","type":"issue","is_Staff":True})
+
+def new_issue_confirmed(request):
+    user = request.user
+    if not (user is not None and user.is_active and user.is_staff):
+        return redirect(reverse("home"))
+    stuff_id = request.POST.get('stuff_id')
+    stuff_name = request.POST.get('stuff_name')
+    username = request.POST.get('username')
+    quantity = request.POST.get('quantity')
+
+    stuff_exists = Stuff.objects.filter(id=stuff_id).exists()
+    user_exists = User.objects.filter(username=username).exists()
+    # return HttpResponse(str(stuff_exists)+ " -- " + str(stuff_id)+" -- " + str(stuff_name)  +" -- " + str(username) +" -- " + str(quantity) + " -- " + str(Stuff.objects.all()[0].id))
+    if not stuff_exists:
+        return HttpResponse("Stuff Not Found 1")
+    if not user_exists:
+        return HttpResponse("User Not Found")
+    try:
+        quantity = int(quantity)
+    except ValueError:
+        return HttpResponse("Enter Integral Quantity")
+    
+    if quantity <= 0:
+        return HttpResponse("Enter Positive Integral Quantity")
+
+    stuff = Stuff.objects.get(id=stuff_id)
+    issue_user = User.objects.get(username=username)
+    now = datetime.datetime.now()
+    issuelog = IssuingLog(user=issue_user,stuff=stuff,quantity=quantity,taketime=now)
+    issuelog.save()
+    return HttpResponseRedirect("/admin_site/")
+
 
 def my_404_view(request):
     return render(render,"404page.html")    
