@@ -4,7 +4,7 @@
       {% load staticfiles %}
     <script src="{% static 'issuestuff/js/jquery.min.js' %}"></script>
     <link href="{% static 'issuestuff/css/bootstrap.min.css' %}" rel="stylesheet" type="text/css" />
-    <link href="{% static 'issuestuff/css/normalize.min.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'issuestuff/css/normalize.css' %}" rel="stylesheet" type="text/css" />
     <script src="{% static 'issuestuff/js/bootstrap.min.js' %}"></script>
     <meta charset="utf-8">
     <title>{% block title %}{% endblock %}</title>
@@ -12,12 +12,30 @@
     {% block style %}{% endblock %}
     </style>    
     <script type="text/javascript">
+      function logout(){
+          $.ajax({
+          url: "http://gymkhana.iitb.ac.in/sso/account/logout/",
+       
+          // The name of the callback parameter, as specified by the YQL service
+          jsonp: "callback",
+       
+          // Tell jQuery we're expecting JSONP
+          dataType: "jsonp",
+       
+          // Work with the response
+          success: function( response ) {
+              console.log( "Logged out of sso." ); // server response
+          }
+      });
+      // window.location("")
+      }
       {% block script %}{% endblock %}
     </script>
 
 
   </head>
   <body>
+
          <nav class="navbar navbar-inverse navbar-fixed-top">
           <div class="container">
             <div class="navbar-header">
@@ -30,7 +48,7 @@
             </ul>
                 <ul class="nav navbar-nav navbar-right">
               <li><a href="#"><span class="glyphicon glyphicon-log-user"></span>{{user.first_name}} {{user.last_name}}</a></li>
-              <li><a onclick="window.open('http://gymkhana.iitb.ac.in/sso/account/logout/');return true;" href="{% url 'logout' %}"><span class="glyphicon glyphicon-log-out"></span>Logout</a></li>
+              <li><a onclick="logout();" href="{% url 'logout' %}"><span class="glyphicon glyphicon-log-out"></span>Logout</a></li>
             </ul>
           </div>
         </nav>
@@ -39,7 +57,7 @@
 
     <footer class="footer navbar-fixed-bottom">
       <div class="container-fluid">
-        <p class="text-muted panel-footer text-center">Developed by STAB webteam.</p>
+        <p class="text-muted panel-footer text-center" id="random">Developed by STAB webteam.</p>
       </div>
     </footer>
 

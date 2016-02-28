@@ -189,6 +189,8 @@ def signup(userdata):
 
 def home(request):
     user = request.user
+    if user is not None and user.is_active and user.is_staff:
+        return redirect(reverse("admin_interface",args=["home"]))
     if user is not None and user.is_active:
         return render(request,'home.html',{'user':user,"active":"home"})
     return redirect(reverse("default"))    
@@ -239,6 +241,8 @@ def admin_interface(request,page):
         return render(request,"admin_home.html")
     elif(page == "records"):
         return HttpResponseRedirect("/admin_site/records/all")
+    elif(page == "issues"):
+        return HttpResponseRedirect("/admin_site/issues/all")
         
 
     return HttpResponse("Page Not Found 2")
@@ -266,10 +270,9 @@ def admin_records_search(request,username):
     if not (user is not None and user.is_active and user.is_staff):
         return redirect(reverse("home"))
 
-    user_exists = User.objects.filter(username=username).exists()
+    user_exists = User.objects.filter(username__startswith=username).exists()
     if user_exists:
-        found_user = User.objects.get(username=username)
-        logs = Log.objects.filter(user=found_user).order_by('-intime')
+        logs = Log.objects.filter(user__username__startswith=username).order_by('-intime')
         return render(request,"admin_records.html",{'logs':logs,"active":"records"})
     else:
         return HttpResponse("User Not Found")
@@ -334,8 +337,9 @@ def new_issue_confirm(request):
     if not stuff_exists:
         return HttpResponse("Stuff Not Found 2")
 
+    users = User.objects.exclude(username="stab")
     stuff = Stuff.objects.get(id=stuff_id)
-    return render(request,"issue_confirm.html",{'stuff':stuff,"active":"issuestuff","type":"issue","is_Staff":True})
+    return render(request,"issue_confirm.html",{'stuff':stuff,"active":"issuestuff","type":"issue","is_Staff":True,"users":users})
 
 def new_issue_confirmed(request):
     user = request.user
@@ -343,7 +347,7 @@ def new_issue_confirmed(request):
         return redirect(reverse("home"))
     stuff_id = request.POST.get('stuff_id')
     stuff_name = request.POST.get('stuff_name')
-    username = request.POST.get('username')
+    username = request.POST.get('username').split(" ")[0]
     quantity = request.POST.get('quantity')
 
     stuff_exists = Stuff.objects.filter(id=stuff_id).exists()
@@ -368,5 +372,37 @@ def new_issue_confirmed(request):
     issuelog.save()
     return HttpResponseRedirect("/admin_site/")
     
+
+def new_stuff_add(request):
+    user = request.user
+    if not (user is not None and user.is_active and user.is_staff):
+        return redirect(reverse("home"))
+    stuff = Stuff.objects.all()    
+    return render(request,'new_stuff_add.html',{'stuffs':stuff})
+
+def new_stuff_confirm(request):
+    user = request.user
+    if not (user is not None and user.is_active and user.is_staff):
+        return redirect(reverse("home"))
+    stuff_name = request.POST.get('stuff_name')
+    if stuff_name=="" or len(stuff_name)>=50:
+        messages.warning(request,"Enter Valid Name of stuff")    
+        return redirect(reverse("new_stuff_add"))
+    stuff = Stuff(name=stuff_name)
+    stuff.save()
+    return redirect(reverse("new_stuff_add"))
+
+def new_stuff(request,param):
+    if param=="add":
+        return redirect(reverse("new_stuff_add"))
+    if param=="confirm":
+        return redirect(reverse("new_stuff_confirm"))
+    return HttpResponse("page not found")
+
 def my_404_view(request):
     return render(render,"404page.html")    
+
+def search_by_username(request):
+    q=request.GET.get("q")
+    users = User.objects.filter(username__startswith=q)
+    return render(request,'search_by_username.html',{'users':users})    
