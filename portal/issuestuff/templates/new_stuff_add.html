@@ -39,7 +39,8 @@
           <li>{{stuff.id}}  {{stuff.name}}</li>
         {%endfor%}
         </ul>  
-      </div>
+            <a href="{% url 'admin_issue' 'stuff' %}" class="btn btn-info" role="button">Issue Stuff</a>
+       </div>
 
     </div>
 {% endblock %}

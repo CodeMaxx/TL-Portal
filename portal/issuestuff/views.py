@@ -88,7 +88,7 @@ def exit(request):
 
 
 def redirect_function(request):
-    authcode = request.GET.get('code', 'lol')
+    authcode = request.GET.get('code', 'error')
     state  = request.GET.get('state', 'error')
     authtoken = clientid+':'+clientsecret
     authtoken = base64.b64encode(authtoken)
@@ -117,7 +117,6 @@ def redirect_function(request):
         return redirect(reverse("default"))
 
     username = userdata.get('username')
-    password=username
 
     user = auth.authenticate(username=username,password=password)
 
@@ -182,7 +181,6 @@ def getdata(acctoken,reftoken):
 
 def signup(userdata):
     username = userdata.get('username')
-    password = username
     first_name = userdata.get('first_name')
     last_name = userdata.get('last_name')
     email = userdata.get('email')
@@ -378,7 +376,7 @@ def new_issue_confirm(request):
     if not stuff_exists:
         return HttpResponse("Stuff Not Found 2")
 
-    users = User.objects.exclude(username="stab")
+    users = User.objects.exclude(username__startswith="tl_")
     stuff = Stuff.objects.get(id=stuff_id)
     return render(request,"issue_confirm.html",{'stuff':stuff,"active":"issuestuff","type":"issue","is_Staff":True,"users":users})
 
