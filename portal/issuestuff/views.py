@@ -21,14 +21,15 @@ import requests
 import json
 import base64
 from django.http import Http404
-
-redirecturl = 'http://localhost:8000/redirect'
-clientid = 'LEdwtHLmG59vmQAh3O8YE1MyeuEUQo0vF59BHN4y'
-clientsecret = 'Ojxvb3sPNZhBa5kdvQeznMGMJf0EhRNqehMBKEkLRX68tzFkpt7X3kbXSSaaVP16aD7HUoi6Py142sCrfVnqawIhKZwDoRsTu4Hb9vnpkwW6K8SeiE7ezwARlPRU7fUJ'
+from portal.env import *
 
 def mainpage(request):
+    user = request.user
+    if user is not None and user.is_active:
+        return redirect(reverse("home"))
     template = loader.get_template('mainpage.html')
-    return render(request,"mainpage.html")
+    users_in = User.objects.filter(member__current_status="IN")
+    return render(request,"mainpage.html",{'users_in':users_in})
 
 def login(request):
     user = request.user
@@ -42,11 +43,25 @@ def ssoURL():
 def logout(request):
     user = request.user
     if user is not None and user.is_active:
-        
         auth.logout(request)
         return redirect(reverse("default"))
     return redirect(reverse("default"))    
     
+def logout_users(request):
+    username = request.POST.get('username')
+    user_exists = User.objects.filter(username=username).exists()
+    if user_exists:
+        user = User.objects.get(username=username)
+        if username is not None and user is not None:
+            if(user.member.current_status=="IN"):
+                now = datetime.datetime.now()
+                user.member.current_status="OUT"
+                user.member.current_log.outtime = now
+                user.member.current_log.save()
+                user.member.save()
+                user.save()
+    return redirect(reverse("default"))    
+
 def enter(request):
     user = request.user
     if user is not None and user.is_active:
@@ -72,16 +87,9 @@ def exit(request):
     return redirect(reverse("default"))    
 
 
-####################################################################
-##########enter the client secret id in the below function########################################
-#################################################################################
-####################################################################
-##########enter the client secret id in the below function########################################
-#################################################################################
 def redirect_function(request):
     authcode = request.GET.get('code', 'lol')
     state  = request.GET.get('state', 'error')
-    # clientsecret = 'intentionally_hidden:-P'
     authtoken = clientid+':'+clientsecret
     authtoken = base64.b64encode(authtoken)
 
@@ -103,9 +111,14 @@ def redirect_function(request):
     acctoken = parsed_json['access_token']
     reftoken = parsed_json['refresh_token']
     userdata = getdata(acctoken,reftoken)
-    # return HttpResponse(userdata)
-    username = userdata['username']
-    password = username
+    check,data = checkEnoughInformation(userdata)
+    if not check:
+        messages.warning(request,"Not enough Information provided. Please allow application to access the required information.")    
+        return redirect(reverse("default"))
+
+    username = userdata.get('username')
+    password=username
+
     user = auth.authenticate(username=username,password=password)
 
     if user is not None and user.is_active:
@@ -116,6 +129,27 @@ def redirect_function(request):
         user = auth.authenticate(username=username,password=password)
         auth.login(request,user)
         return HttpResponseRedirect("/home/")    
+
+def checkEnoughInformation(userdata):
+    username = userdata.get('username')
+    first_name = userdata.get('first_name')
+    last_name = userdata.get('last_name')
+    email = userdata.get('email')
+    roll_number = userdata.get('roll_number')
+    notGivenInfo = []
+    if username is None:
+        notGivenInfo.append('username')
+    if first_name is None:
+        notGivenInfo.append('first_name')
+    if last_name is None:
+        notGivenInfo.append('last_name')
+    if email is None:
+        notGivenInfo.append('email')
+    if roll_number is None:
+        notGivenInfo.append('roll_number')
+    if len(notGivenInfo)>0:
+        return False,notGivenInfo
+    return True,notGivenInfo
 
 def new_record(request):
     user = request.user
@@ -192,7 +226,14 @@ def home(request):
     if user is not None and user.is_active and user.is_staff:
         return redirect(reverse("admin_interface",args=["home"]))
     if user is not None and user.is_active:
-        return render(request,'home.html',{'user':user,"active":"home"})
+        visit_number = Log.objects.filter(user=user).count()
+        if visit_number==1:
+            sym = "st"
+        elif visit_number==2:
+            sym = "nd"
+        else:
+            sym = "th"        
+        return render(request,'home.html',{'user':user,"active":"home","visit_number":visit_number,"sym":sym})
     return redirect(reverse("default"))    
 
 def validateEmail(email ):

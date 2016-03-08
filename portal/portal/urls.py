@@ -45,6 +45,7 @@ urlpatterns = [
     url(r'^stuff/$', issuestuff, name='issuestuff'),
     url(r'^secondary_email/$', enter_secondary_email, name='secondary_email'),
     url(r'^search_by_username/$', search_by_username, name='search_by_username'),
+    url(r'^logout_users$', logout_users, name='logout_users'),
     # url(r'^TL_records/$', TL_records, name='redirect'),
     url(r'^$', mainpage, name='default'),
 ]  + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

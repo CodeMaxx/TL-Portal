@@ -89,17 +89,75 @@
     <link href="{% static 'issuestuff/css/normalize.min.css' %}" rel="stylesheet" type="text/css" />
     <script src="{% static 'issuestuff/js/bootstrap.min.js' %}"></script>
     <body>
-        <div class="container-fluid">
-            <div class="masthead">
 
-                  <div align="text-center">
-                    <h1 style="font-size: 100px">Tinkerers' Lab</h1>
-                    <a href = '{% url "login" %}'><button type="button" class="btn btn-outline-inverse btn-lg"> Login </button></a>
-                  </div>
-                    </div>
+         <nav class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container">
+            <div class="navbar-header">
+              <a class="navbar-brand" href="">Tinkerers' Lab</a>
             </div>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="{% url "login" %}"><span class="glyphicon glyphicon-log-in"></span>Login</a></li>
+            </ul>
             </div>
-        </div>
+          </nav>             
+
+           <div class="container container-table">
+           <br>
+           <br>
+           <br>
+           {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+              <h3 align="center">Current Users in TL</h3>
+              <div class="col-md-8 col-md-offset-2">
+                  <form method="POST" action="/logout_users">
+                    {%csrf_token%}
+                    <table class="table table-bordered">
+                        <thead>
+                          <tr>
+                            <th>User Name</th>
+                            <th>Name</th>
+                            <th>Roll Number</th>
+                            <th>Exit TL?</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                        {%for user in users_in%}
+                            <tr>
+                                <td>
+                                    <b>{{user.username}}</b>
+                                </td>
+                                <td>
+                                    <b>{{user.first_name}} {{user.last_name}}</b>
+                                </td>
+                                <td>
+                                    <b>{{user.member.roll}}</b>
+                                </td>
+                                <td>
+                                    <input type="radio" name="username" id="{{user.username}}" value="{{user.username}}">
+                                </td>
+                            </tr>
+                        {%endfor%}            
+                        </tbody>
+                        </table>
+                       <div class="row">
+                        <div class="col-md-2 col-md-offset-5">
+                              <button type="submit" class="btn btn-primary">Exit TL</button>
+                        </div>
+                       </div>              
+                   </form>    
+               </div>
+            </div>
+        <footer class="footer navbar-fixed-bottom">
+          <div class="container-fluid">
+            <p class="text-muted panel-footer text-center" >Developed by STAB webteam.</p>
+          </div>
+        </footer>
     </body>
 </html>
 

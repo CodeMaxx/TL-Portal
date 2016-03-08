@@ -27,7 +27,8 @@ html, body, .container-table {
             {% if request.user.member.secondary_email != None %}
             {% if request.user.member.current_status == "IN" %}
             <div class="text-center col-xs-12 ">
-                <a href = "{% url 'exit' %}"><button type="button" class="btn btn-primary btn-lg">Click here to exit</button></a>
+                <h3>Welcome {{user.first_name}} {{user.last_name}}!</h3>
+                <h4>You are visiting TL for the {{visit_number}}{{sym}} time</h4>
             </div>
             {% else %}
                 <form class="form-horizontal" role="form" method="post" action="{% url 'enter' %}">
