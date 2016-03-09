@@ -155,6 +155,7 @@ class Member(models.Model):
     ('D.I.T.T. (Exit Degree)', 'D.I.T.T. (Exit Degree)') ,
        )
     sex = models.CharField(max_length=10,choices=SEX,blank=True,null=True)
+    password = models.CharField(max_length=50,blank=True,null=True)
     contact = models.CharField(max_length=12,blank=True,null=True)
     hostel = models.CharField(max_length=20,blank=True,null=True,choices=HOSTELS)
     room = models.CharField(max_length=5,blank=True,null=True)

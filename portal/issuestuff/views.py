@@ -22,6 +22,7 @@ import json
 import base64
 from django.http import Http404
 from portal.env import *
+import hashlib
 
 def mainpage(request):
     user = request.user
@@ -35,10 +36,16 @@ def login(request):
     user = request.user
     if user is not None and user.is_active:
         return redirect(reverse('home'))
-    return HttpResponseRedirect(ssoURL()) 
+    return HttpResponseRedirect(ssoURL("signin")) 
 
-def ssoURL():
-    return 'http://gymkhana.iitb.ac.in/sso/oauth/authorize/?client_id='+clientid+'&response_type=code&scope=basic%20profile%20ldap%20sex%20picture%20phone%20insti_address%20program%20secondary_emails&redirect_uri='+redirecturl+'&state=enter'
+def forgotpassword(request):
+    user = request.user
+    if user is not None and user.is_active:
+        return redirect(reverse('home'))
+    return HttpResponseRedirect(ssoURL("forgotpassword")) 
+
+def ssoURL(state):
+    return 'http://gymkhana.iitb.ac.in/sso/oauth/authorize/?client_id='+clientid+'&response_type=code&scope=basic%20profile%20ldap%20sex%20picture%20phone%20insti_address%20program%20secondary_emails&redirect_uri='+redirecturl+'&state='+state
 
 def logout(request):
     user = request.user
@@ -86,10 +93,25 @@ def exit(request):
         return redirect(reverse("home"))
     return redirect(reverse("default"))    
 
+def set_password(request):
+    user = request.user
+    if user is not None and user.is_active:
+        passwd = request.POST.get('password')
+        confirmpasswd = request.POST.get('confirmpassword')
+        if passwd == None or len(passwd)<6 or len(passwd)>40:
+            messages.warning(request,"Empty password. Length of password should be in [6,40].")
+            return redirect(reverse("home"))
+        if passwd != confirmpasswd:
+            messages.warning(request,"Passwords not matching. Please again set password.")
+            return redirect(reverse("home"))
+        hash_pwd= hashlib.sha512(passwd).hexdigest()
+        user.member.password=hash_pwd
+        user.member.save()
+    return redirect(reverse("home"))
 
 def redirect_function(request):
     authcode = request.GET.get('code', 'error')
-    state  = request.GET.get('state', 'error')
+    state  = request.GET.get('state')
     authtoken = clientid+':'+clientsecret
     authtoken = base64.b64encode(authtoken)
 
@@ -121,7 +143,10 @@ def redirect_function(request):
     user = auth.authenticate(username=username,password=password)
 
     if user is not None and user.is_active:
-        auth.login(request,user)
+        auth.login(request,user)  
+        if(state=="forgotpassword"):
+            request.user.member.password=None
+            request.user.member.save()
         return HttpResponseRedirect("/home/")
     else:
         signup(userdata)
@@ -164,7 +189,34 @@ def new_record(request):
             user.member.save()
             user.save()
         return True
-    return False        
+    return False      
+
+def new_entry(request):
+    username = request.POST.get("username")
+    passwd = request.POST.get("password")
+    purpose = request.POST.get("purpose")
+
+    if "" in [username,passwd,purpose]:
+        messages.warning(request,"Form not completely filled.")      
+        return redirect(reverse("default"))
+
+    user_exists = User.objects.filter(username=username).exists()
+    if not user_exists:
+        messages.warning(request,"User does not exist. Sign Up first.")
+        return redirect(reverse("default"))
+    user = User.objects.get(username=username)
+    if hashlib.sha512(passwd).hexdigest()!=user.member.password:
+        messages.warning(request,"Password does not match.")
+        return redirect(reverse("default"))
+    if user.member.current_status!="IN":    
+        now = datetime.datetime.now()
+        log = Log(user=user,intime=now,purpose=purpose)
+        log.save()
+        user.member.current_status="IN"
+        user.member.current_log=log
+        user.member.save()
+        user.save()
+    return redirect(reverse("default"))        
 
 def getdata(acctoken,reftoken):
     fields = 'first_name,last_name,type,profile_picture,sex,username,email,program,contacts,insti_address,secondary_emails,mobile,roll_number'
@@ -215,7 +267,7 @@ def signup(userdata):
     auth_user = User.objects.create_user(username=username,password=password,email=email,first_name=first_name,last_name=last_name)
     auth_user.save()
 
-    _user = Member(user=auth_user,roll=roll_number,sex=sex,contact=contact,hostel=hostel,room=room,discipline=discipline,join_year=join_year,graduation_year=graduation_year,degree=degree,current_status=current_status,current_log = current_log,secondary_email=secondary_email)
+    _user = Member(user=auth_user,roll=roll_number,sex=sex,contact=contact,hostel=hostel,room=room,discipline=discipline,join_year=join_year,graduation_year=graduation_year,degree=degree,current_status=current_status,current_log = current_log,secondary_email=secondary_email,password=None)
     _user.save()
     return 
 

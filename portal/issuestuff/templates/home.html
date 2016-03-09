@@ -24,6 +24,7 @@ html, body, .container-table {
                 {% endfor %}
             </ul>
             {% endif %}
+            {% if request.user.member.password != None %}
             {% if request.user.member.secondary_email != None %}
             {% if request.user.member.current_status == "IN" %}
             <div class="text-center col-xs-12 ">
@@ -53,6 +54,20 @@ html, body, .container-table {
               <div class="form-group">
                 <label for="email">Secondary Email Address (preferably gmail)</label>
                 <input type="email" class="form-control" id="email" name="email">
+              </div>
+              <button type="submit" class="btn btn-default">Submit</button>
+            </form>
+            {% endif %}
+            {% else %}
+             <form class="form-horizontal" role="form" action="{% url 'set_password' %}" method="post">
+             {% csrf_token %}
+              <div class="form-group">
+                <label for="password">Password For TL account (Can be different from LDAP password, length between 6 and 40)</label>
+                <input type="password" class="form-control" id="password" name="password">
+              </div>
+              <div class="form-group">
+                <label for="confirmpassword">Confirm Password</label>
+                <input type="password" class="form-control" id="confirmpassword" name="confirmpassword">
               </div>
               <button type="submit" class="btn btn-default">Submit</button>
             </form>
