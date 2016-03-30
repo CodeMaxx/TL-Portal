@@ -3,6 +3,7 @@
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+        <meta http-equiv="Refresh" content="3600">
         <style>
         html, body {
             height: 100%;
@@ -85,7 +86,7 @@
       {% load staticfiles %}
     <script src="{% static 'issuestuff/js/jquery.min.js' %}"></script>
     <link href="{% static 'issuestuff/css/bootstrap.min.css' %}" rel="stylesheet" type="text/css" />
-    <link href="{% static 'issuestuff/css/normalize.min.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'issuestuff/css/normalize.css' %}" rel="stylesheet" type="text/css" />
     <script src="{% static 'issuestuff/js/bootstrap.min.js' %}"></script>
     </head>
     <body>
@@ -96,9 +97,9 @@
               <a class="navbar-brand" href="">Tinkerers' Lab</a>
             </div>
             <ul class="nav navbar-nav navbar-right">
-              <li><a href='{% url "signup" %}'><span class="glyphicon glyphicon-log-in"></span>Sign Up</a></li>
-              <li><a href='{% url "login" %}'><span class="glyphicon glyphicon-log-in"></span>Sign In</a></li>
-              <li><a href='{% url "forgotpassword" %}'><span class="glyphicon glyphicon-log-in"></span>Forgot Password?</a></li>
+              <li><a href='{% url "signup" %}'>Sign Up</a></li>
+              <li><a href='{% url "login" %}'>Sign In</a></li>
+              <li><a href='{% url "forgotpassword" %}'>Forgot Password?</a></li>
             </ul>
             </div>
           </nav>             
@@ -180,7 +181,11 @@
                    </form>    
                </div>
             </div>
-        <footer class="footer ">
+            <br>
+            <br>
+            <br>
+            <br>
+        <footer class="footer navbar-fixed-bottom ">
           <div class="container-fluid">
             <p class="text-muted panel-footer text-center" >Developed by STAB webteam.</p>
           </div>

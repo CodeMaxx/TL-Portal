@@ -10,6 +10,7 @@ class IssuingLog(models.Model):
     stuff = models.ForeignKey(Stuff)
     quantity = models.CharField(max_length=10,blank=True,null=True)
     taketime = models.DateTimeField(blank=True,null=True)
+    expectedreturntime = models.DateTimeField(blank=True,null=True)
     returntime = models.DateTimeField(blank=True,null=True)
 
 class Log(models.Model):

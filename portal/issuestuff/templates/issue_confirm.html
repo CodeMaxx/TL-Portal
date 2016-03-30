@@ -4,7 +4,6 @@
 {% block script %}
 $(document).ready(function() {
       var substringMatcher = function(strs) {
-          console.log(strs);
         return function findMatches(q, cb) {
           var matches, substringRegex;
 
@@ -41,9 +40,18 @@ $(document).ready(function() {
         name: 'somename',
         source: substringMatcher(users)
       });
-});
+      var nowDate = new Date();
+      var today = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate(), 0, 0, 0, 0);
+       $('#datetimepicker1').datetimepicker({
+       format:'DD MMMM YYYY',
+       });
 
+       $('#returndate').datetimepicker({
+       format:'DD MMMM YYYY',
+       });
+});
 {% endblock %}
+
 
 {% block content %}    
 	<br>
@@ -66,6 +74,15 @@ $(document).ready(function() {
           <div class="form-group">
             <label for="stuff_name">Stuff Name</label>
             <input id="stuff_name" name="stuff_name" value="{{stuff.name}}" type="text" readonly="readonly" class="form-control">
+          </div>
+          <div class="form-group" id="returndatediv">
+            <label for="returndate">Expected Date of Return</label>
+            <div class='input-group' id='datetimepicker1'>
+              <input type='text' class="form-control" id="returndate" name="expectedreturntime" />
+              <span class="input-group-addon">
+                  <span class="glyphicon glyphicon-calendar"></span>
+              </span>
+            </div>
           </div>
           <div class="form-group">
             <label for="quantity">Quantity</label>

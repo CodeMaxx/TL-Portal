@@ -3,9 +3,13 @@
   <head>
       {% load staticfiles %}
     <script src="{% static 'issuestuff/js/jquery.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'issuestuff/js/moment.js' %}"></script>
+    <script type="text/javascript" src="{% static  'issuestuff/js/transition.js' %}"></script>
+    <script type="text/javascript" src="{% static  'issuestuff/js/collapse.js' %}"></script>
     <link href="{% static 'issuestuff/css/bootstrap.min.css' %}" rel="stylesheet" type="text/css" />
     <link href="{% static 'issuestuff/css/normalize.css' %}" rel="stylesheet" type="text/css" />
     <script src="{% static 'issuestuff/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'issuestuff/js/bootstrap-datetimepicker.js' %}"></script>
     <script src="{% static 'issuestuff/js/typeahead.bundle.js' %}"></script>
     {% block includes %}{% endblock %}
     <meta charset="utf-8">
@@ -55,7 +59,10 @@
         </nav>
 
    {% block content %}{% endblock %}
-
+    <br>
+    <br>
+    <br>
+    <br>
     <footer class="footer navbar-fixed-bottom">
       <div class="container-fluid">
         <p class="text-muted panel-footer text-center" >Developed by STAB webteam.</p>

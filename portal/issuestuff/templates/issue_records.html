@@ -19,6 +19,7 @@
         <th>Stuff</th>
         <th>Quantity</th>
         <th>Take Time</th>
+        <th>Expected Return Time</th>
         <th>Return Time</th>
       </tr>
     </thead>
@@ -34,6 +35,7 @@
           <td>{{log.stuff.id}} -> {{log.stuff.name}}</td>
           <td>{{log.quantity}}</td>
           <td>{{log.taketime}}</td>
+          <td>{{log.expectedreturntime}}</td>
           <td>
           {% if is_Staff %}
             {% if log.returntime != None %} 

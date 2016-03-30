@@ -10,11 +10,13 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
+from django.core.mail import send_mail
 from django.contrib import auth
 from django.contrib.auth.models import User
 from models import *
 import datetime
 from django.contrib import messages
+from django.template.loader import render_to_string
 # from django.core.servers.basehttp import FileWrapper
 import re
 import requests
@@ -23,6 +25,7 @@ import base64
 from django.http import Http404
 from portal.env import *
 import hashlib
+
 
 def mainpage(request):
     user = request.user
@@ -116,7 +119,7 @@ def redirect_function(request):
     authtoken = base64.b64encode(authtoken)
 
     #state shows whether the user is entering and exiting
-    url = 'http://gymkhana.iitb.ac.in/sso/oauth/token/'
+    url = 'https://gymkhana.iitb.ac.in/sso/oauth/token/'
     header = {
         'Host': 'gymkhana.iitb.ac.in',
         'Authorization': 'Basic '+authtoken,
@@ -129,6 +132,7 @@ def redirect_function(request):
         'grant_type' : "authorization_code"
         }
     r = requests.post(url,data=payload,headers=header)
+
     parsed_json = json.loads(r.content)
     acctoken = parsed_json['access_token']
     reftoken = parsed_json['refresh_token']
@@ -147,12 +151,12 @@ def redirect_function(request):
         if(state=="forgotpassword"):
             request.user.member.password=None
             request.user.member.save()
-        return HttpResponseRedirect("/home/")
+        return HttpResponseRedirect(reverse('home'))
     else:
         signup(userdata)
         user = auth.authenticate(username=username,password=password)
         auth.login(request,user)
-        return HttpResponseRedirect("/home/")    
+        return HttpResponseRedirect(reverse('home'))    
 
 def checkEnoughInformation(userdata):
     username = userdata.get('username')
@@ -331,9 +335,9 @@ def admin_interface(request,page):
     elif(page == "home"):
         return render(request,"admin_home.html")
     elif(page == "records"):
-        return HttpResponseRedirect("/admin_site/records/all")
+        return HttpResponseRedirect("/admin_site/records/all/")
     elif(page == "issues"):
-        return HttpResponseRedirect("/admin_site/issues/all")
+        return HttpResponseRedirect("/admin_site/issues/all/")
         
 
     return HttpResponse("Page Not Found 2")
@@ -424,7 +428,6 @@ def new_issue_confirm(request):
 
     stuff_id = request.POST.get('stuff_id')
     stuff_exists = Stuff.objects.filter(id=stuff_id).exists()
-    # return HttpResponse(str(stuff_exists)+ " -- " + str(stuff_id) + " -- " + str(Stuff.objects.all()[0].id))
     if not stuff_exists:
         return HttpResponse("Stuff Not Found 2")
 
@@ -440,7 +443,11 @@ def new_issue_confirmed(request):
     stuff_name = request.POST.get('stuff_name')
     username = request.POST.get('username').split(" ")[0]
     quantity = request.POST.get('quantity')
-
+    expectedreturntime = request.POST.get('expectedreturntime')
+    expectedreturntime = datetime.datetime.strptime(expectedreturntime,"%d %B %Y")
+    if "" in [stuff_id,stuff_name,username,quantity,expectedreturntime]:
+        messages.warning(request,"Form not completely filled. Issue again.")
+        return redirect(reverse("admin_issue",args=["stuff"]))
     stuff_exists = Stuff.objects.filter(id=stuff_id).exists()
     user_exists = User.objects.filter(username=username).exists()
     # return HttpResponse(str(stuff_exists)+ " -- " + str(stuff_id)+" -- " + str(stuff_name)  +" -- " + str(username) +" -- " + str(quantity) + " -- " + str(Stuff.objects.all()[0].id))
@@ -459,10 +466,22 @@ def new_issue_confirmed(request):
     stuff = Stuff.objects.get(id=stuff_id)
     issue_user = User.objects.get(username=username)
     now = datetime.datetime.now()
-    issuelog = IssuingLog(user=issue_user,stuff=stuff,quantity=quantity,taketime=now)
+    issuelog = IssuingLog(user=issue_user,stuff=stuff,quantity=quantity,taketime=now,expectedreturntime=expectedreturntime)
     issuelog.save()
+    subject,content = getmailcontent_issue(user=issue_user,stuff=stuff,quantity=quantity,taketime=now,expectedreturntime=expectedreturntime)
+    sendmail(issue_user.email,subject,content)
     return HttpResponseRedirect("/admin_site/")
     
+def getmailcontent_issue(user,stuff,quantity,taketime,expectedreturntime):
+    subject = "Tinkerers' Lab New Issue : "+stuff.name    
+    taketime =  str(taketime.strftime('%d %B %Y'))
+    expectedreturntime = str(expectedreturntime.strftime('%b %d,%Y'))
+    content = render_to_string("issue_email.html",{'user':user,'stuff':stuff,'quantity':str(quantity),'taketime':taketime,'expectedreturntime':expectedreturntime,'TECHINICIAN_NAME':TECHINICIAN_NAME,'POST':POST,'INSTITUTE':INSTITUTE })
+    return subject,content        
+
+def sendmail(email,subject,content):
+    send_mail(EMAIL_SUBJECT_PREFIX+" "+subject,'', EMAIL_FROM,[email], fail_silently=False, html_message=content)
+    return 
 
 def new_stuff_add(request):
     user = request.user
@@ -493,7 +512,13 @@ def new_stuff(request,param):
 def my_404_view(request):
     return render(render,"404page.html")    
 
+def my_500_view(request):
+    return render(render,"500page.html")    
+
 def search_by_username(request):
     q=request.GET.get("q")
     users = User.objects.filter(username__startswith=q)
     return render(request,'search_by_username.html',{'users':users})    
+
+def admin_page(request):
+    return redirect("/admin/")
