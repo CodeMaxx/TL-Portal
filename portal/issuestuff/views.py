@@ -48,7 +48,7 @@ def forgotpassword(request):
     return HttpResponseRedirect(ssoURL("forgotpassword")) 
 
 def ssoURL(state):
-    return 'http://gymkhana.iitb.ac.in/sso/oauth/authorize/?client_id='+clientid+'&response_type=code&scope=basic%20profile%20ldap%20sex%20picture%20phone%20insti_address%20program%20secondary_emails&redirect_uri='+redirecturl+'&state='+state
+    return 'https://gymkhana.iitb.ac.in/sso/oauth/authorize/?client_id='+clientid+'&response_type=code&scope=basic%20profile%20ldap%20sex%20picture%20phone%20insti_address%20program%20secondary_emails&redirect_uri='+redirecturl+'&state='+state
 
 def logout(request):
     user = request.user
@@ -224,7 +224,7 @@ def new_entry(request):
 
 def getdata(acctoken,reftoken):
     fields = 'first_name,last_name,type,profile_picture,sex,username,email,program,contacts,insti_address,secondary_emails,mobile,roll_number'
-    url = 'http://gymkhana.iitb.ac.in/sso/user/api/user/?fields='+fields
+    url = 'https://gymkhana.iitb.ac.in/sso/user/api/user/?fields='+fields
     header = {
         'GET /sso/user/api/user/ HTTP/1.1'
         'Host': 'gymkhana.iitb.ac.in',
