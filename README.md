@@ -1,2 +1,4 @@
 # TL-Portal
-Portal for issuing stuff from Tinkerer's Lab
+Django Webapp for issuing equipments from Tinkerer's Lab and keeping track of entrants
+
+
