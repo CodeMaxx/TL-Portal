@@ -39,13 +39,13 @@ def login(request):
     user = request.user
     if user is not None and user.is_active:
         return redirect(reverse('home'))
-    return HttpResponseRedirect(ssoURL("signin")) 
+    return HttpResponseRedirect(ssoURL("signin"))
 
 def forgotpassword(request):
     user = request.user
     if user is not None and user.is_active:
         return redirect(reverse('home'))
-    return HttpResponseRedirect(ssoURL("forgotpassword")) 
+    return HttpResponseRedirect(ssoURL("forgotpassword"))
 
 def ssoURL(state):
     return 'https://gymkhana.iitb.ac.in/sso/oauth/authorize/?client_id='+clientid+'&response_type=code&scope=basic%20profile%20ldap%20sex%20picture%20phone%20insti_address%20program%20secondary_emails&redirect_uri='+redirecturl+'&state='+state
@@ -55,8 +55,8 @@ def logout(request):
     if user is not None and user.is_active:
         auth.logout(request)
         return redirect(reverse("default"))
-    return redirect(reverse("default"))    
-    
+    return redirect(reverse("default"))
+
 def logout_users(request):
     username = request.POST.get('username')
     user_exists = User.objects.filter(username=username).exists()
@@ -70,7 +70,7 @@ def logout_users(request):
                 user.member.current_log.save()
                 user.member.save()
                 user.save()
-    return redirect(reverse("default"))    
+    return redirect(reverse("default"))
 
 def enter(request):
     user = request.user
@@ -79,8 +79,8 @@ def enter(request):
             return redirect(reverse("home"))
         else:
             messages.warning(request, 'Please fill purpose.')
-            return redirect(reverse("home"))    
-    return redirect(reverse("default"))    
+            return redirect(reverse("home"))
+    return redirect(reverse("default"))
 
 
 def exit(request):
@@ -94,7 +94,7 @@ def exit(request):
             user.member.save()
             user.save()
         return redirect(reverse("home"))
-    return redirect(reverse("default"))    
+    return redirect(reverse("default"))
 
 def set_password(request):
     user = request.user
@@ -123,7 +123,7 @@ def redirect_function(request):
     header = {
         'Host': 'gymkhana.iitb.ac.in',
         'Authorization': 'Basic '+authtoken,
-        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'    
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
     }
 
     payload = {
@@ -139,7 +139,7 @@ def redirect_function(request):
     userdata = getdata(acctoken,reftoken)
     check,data = checkEnoughInformation(userdata)
     if not check:
-        messages.warning(request,"Not enough Information provided. Please allow application to access the required information.")    
+        messages.warning(request,"Not enough Information provided. Please allow application to access the required information.")
         return redirect(reverse("default"))
 
     username = userdata.get('username')
@@ -147,7 +147,7 @@ def redirect_function(request):
     user = auth.authenticate(username=username,password=password)
 
     if user is not None and user.is_active:
-        auth.login(request,user)  
+        auth.login(request,user)
         if(state=="forgotpassword"):
             request.user.member.password=None
             request.user.member.save()
@@ -156,7 +156,7 @@ def redirect_function(request):
         signup(userdata)
         user = auth.authenticate(username=username,password=password)
         auth.login(request,user)
-        return HttpResponseRedirect(reverse('home'))    
+        return HttpResponseRedirect(reverse('home'))
 
 def checkEnoughInformation(userdata):
     username = userdata.get('username')
@@ -193,7 +193,7 @@ def new_record(request):
             user.member.save()
             user.save()
         return True
-    return False      
+    return False
 
 def new_entry(request):
     username = request.POST.get("username")
@@ -201,7 +201,7 @@ def new_entry(request):
     purpose = request.POST.get("purpose")
 
     if "" in [username,passwd,purpose]:
-        messages.warning(request,"Form not completely filled.")      
+        messages.warning(request,"Form not completely filled.")
         return redirect(reverse("default"))
 
     user_exists = User.objects.filter(username=username).exists()
@@ -212,7 +212,7 @@ def new_entry(request):
     if hashlib.sha512(passwd).hexdigest()!=user.member.password:
         messages.warning(request,"Password does not match.")
         return redirect(reverse("default"))
-    if user.member.current_status!="IN":    
+    if user.member.current_status!="IN":
         now = datetime.datetime.now()
         log = Log(user=user,intime=now,purpose=purpose)
         log.save()
@@ -220,7 +220,7 @@ def new_entry(request):
         user.member.current_log=log
         user.member.save()
         user.save()
-    return redirect(reverse("default"))        
+    return redirect(reverse("default"))
 
 def getdata(acctoken,reftoken):
     fields = 'first_name,last_name,type,profile_picture,sex,username,email,program,contacts,insti_address,secondary_emails,mobile,roll_number'
@@ -273,7 +273,7 @@ def signup(userdata):
 
     _user = Member(user=auth_user,roll=roll_number,sex=sex,contact=contact,hostel=hostel,room=room,discipline=discipline,join_year=join_year,graduation_year=graduation_year,degree=degree,current_status=current_status,current_log = current_log,secondary_email=secondary_email,password=None)
     _user.save()
-    return 
+    return
 
 def home(request):
     user = request.user
@@ -286,9 +286,9 @@ def home(request):
         elif visit_number==2:
             sym = "nd"
         else:
-            sym = "th"        
+            sym = "th"
         return render(request,'home.html',{'user':user,"active":"home","visit_number":visit_number,"sym":sym})
-    return redirect(reverse("default"))    
+    return redirect(reverse("default"))
 
 def validateEmail(email ):
     from django.core.validators import validate_email
@@ -308,7 +308,7 @@ def enter_secondary_email(request):
                 user.member.secondary_email=email
                 user.member.save()
             else:
-                messages.warning(request,"Please enter correct email address.")    
+                messages.warning(request,"Please enter correct email address.")
     return redirect(reverse("home"))
 
 def tl_records(request):
@@ -324,7 +324,7 @@ def issuestuff(request):
         issuelog = IssuingLog.objects.filter(user=user)
         return render(request,"issue_records.html",{'logs':issuelog,"active":"issuestuff","type":"return","is_Staff":False})
     return redirect(reverse("default"))
-    
+
 def admin_interface(request,page):
     user = request.user
     if not (user is not None and user.is_active and user.is_staff):
@@ -338,7 +338,7 @@ def admin_interface(request,page):
         return HttpResponseRedirect("/admin_site/records/all/")
     elif(page == "issues"):
         return HttpResponseRedirect("/admin_site/issues/all/")
-        
+
 
     return HttpResponse("Page Not Found 2")
 
@@ -459,7 +459,7 @@ def new_issue_confirmed(request):
         quantity = int(quantity)
     except ValueError:
         return HttpResponse("Enter Integral Quantity")
-    
+
     if quantity <= 0:
         return HttpResponse("Enter Positive Integral Quantity")
 
@@ -471,23 +471,23 @@ def new_issue_confirmed(request):
     subject,content = getmailcontent_issue(user=issue_user,stuff=stuff,quantity=quantity,taketime=now,expectedreturntime=expectedreturntime)
     sendmail(issue_user.email,subject,content)
     return HttpResponseRedirect("/admin_site/")
-    
+
 def getmailcontent_issue(user,stuff,quantity,taketime,expectedreturntime):
-    subject = "Tinkerers' Lab New Issue : "+stuff.name    
+    subject = "Tinkerers' Lab New Issue : "+stuff.name
     taketime =  str(taketime.strftime('%d %B %Y'))
     expectedreturntime = str(expectedreturntime.strftime('%b %d,%Y'))
     content = render_to_string("issue_email.html",{'user':user,'stuff':stuff,'quantity':str(quantity),'taketime':taketime,'expectedreturntime':expectedreturntime,'TECHINICIAN_NAME':TECHINICIAN_NAME,'POST':POST,'INSTITUTE':INSTITUTE })
-    return subject,content        
+    return subject,content
 
 def sendmail(email,subject,content):
     send_mail(EMAIL_SUBJECT_PREFIX+" "+subject,'', EMAIL_FROM,[email], fail_silently=False, html_message=content)
-    return 
+    return
 
 def new_stuff_add(request):
     user = request.user
     if not (user is not None and user.is_active and user.is_staff):
         return redirect(reverse("home"))
-    stuff = Stuff.objects.all()    
+    stuff = Stuff.objects.all()
     return render(request,'new_stuff_add.html',{'stuffs':stuff})
 
 def new_stuff_confirm(request):
@@ -496,7 +496,7 @@ def new_stuff_confirm(request):
         return redirect(reverse("home"))
     stuff_name = request.POST.get('stuff_name')
     if stuff_name=="" or len(stuff_name)>=50:
-        messages.warning(request,"Enter Valid Name of stuff")    
+        messages.warning(request,"Enter Valid Name of stuff")
         return redirect(reverse("new_stuff_add"))
     stuff = Stuff(name=stuff_name)
     stuff.save()
@@ -510,15 +510,15 @@ def new_stuff(request,param):
     return HttpResponse("page not found")
 
 def my_404_view(request):
-    return render(render,"404page.html")    
+    return render(render,"404page.html")
 
 def my_500_view(request):
-    return render(render,"500page.html")    
+    return render(render,"500page.html")
 
 def search_by_username(request):
     q=request.GET.get("q")
     users = User.objects.filter(username__startswith=q)
-    return render(request,'search_by_username.html',{'users':users})    
+    return render(request,'search_by_username.html',{'users':users})
 
 def admin_page(request):
     return redirect("/admin/")
